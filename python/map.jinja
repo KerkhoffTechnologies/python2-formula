@@ -1,29 +1,45 @@
-{% set python2 = salt['grains.filter_by']({
-    'Debian': {
-        'pkg': 'python',
-        'dev_pkg': 'python-dev',
-        'mako_pkg': 'python-mako',
-        'pip_pkg': 'python-pip',
-    },
-    'RedHat': {
-        'pkg': 'python',
-        'dev_pkg': 'python-devel',
-        'mako_pkg': 'python-mako',
-        'pip_pkg': 'python-pip',
-    },
-}, merge=salt['pillar.get']('python2:lookup')) %}
+{% macro sls_block(dict) %}
+    {% for key, value in dict.items() %}
+    - {{ key }}: {{ value|json() }}
+    {% endfor %}
+{% endmacro %}
 
-{% set python3 = salt['grains.filter_by']({
-    'Debian': {
-        'pkg': 'python3',
-        'dev_pkg': 'python3-dev',
-        'mako_pkg': 'python3-mako',
-        'pip_pkg': 'python3-pip',
+{% set python2 = salt['pillar.get']('python2', {
+    'lookup': salt['grains.filter_by']({
+        'Debian': {
+            'package': 'python',
+            'dev_package': 'python-dev',
+            'pip_package': 'python-pip',
+            'virtualenv_package': 'virtualenv',
+            'pip': False,
+            'dev': False,
+            'virtualenv': False,
+        },
+        'RedHat': {
+            'package': 'python',
+            'dev_package': 'python-devel',
+            'pip_package': 'python-pip',
+            'virtualenv_package': 'virtualenv',
+            'pip': False,
+            'dev': False,
+            'virtualenv': False,
+        },
+    }, default='Debian' ),
+    'package': {
+        'opts': {},
     },
-    'RedHat': {
-        'pkg': 'python3',
-        'dev_pkg': 'python3-devel',
-        'mako_pkg': 'python3-mako',
-        'pip_pkg': 'python3-pip',
+    'pip': {
+        'opts': {},
     },
-}, merge=salt['pillar.get']('python3:lookup')) %}
+    'dev': {
+        'opts': {},
+    },
+    'virtualenv': {
+        'opts': {},
+    },
+    'virtualenvs': {
+        'managed': {},
+    },
+}, merge=True) %}
+
+
