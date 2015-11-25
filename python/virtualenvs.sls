@@ -4,11 +4,14 @@
 
 {% from 'python/map.jinja' import python2, sls_block with context %}
 
-# Simple path concatenation.
-# Needs work to make this function on windows.
-{% macro path_join(file, root) -%}
-  {{ root ~ '/' ~ file }}
-{%- endmacro %}
+{%- if python2.lookup.virtualenv == True %}
+python_virtualenv_install:
+  pip.installed:
+    {{ sls_block(python2.virtualenv.opts) }}
+    - name: {{ python2.lookup.virtualenv_package }}
+    - require:
+      - pkg: python_pip_install
+{% endif %}
 
 # Managed enabled/disabled state for vhosts
 {% for virtualenv, settings in python2.virtualenvs.managed.items() %}

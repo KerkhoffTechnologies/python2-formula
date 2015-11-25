@@ -3,4 +3,5 @@
 include:
   - python.install
   - python.virtualenvs
+  - python.pip
 
