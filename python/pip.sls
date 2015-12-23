@@ -1,7 +1,5 @@
 {% from "python/map.jinja" import python2, sls_block with context %}
 
-{% from "python/map.jinja" import python2, sls_block with context %}
-
 {% if python2.lookup.pip == True -%}
 python_pip_install:
   pkg.installed:
@@ -9,13 +7,11 @@ python_pip_install:
     - name: {{ python2.lookup.pip_package }}
 {% endif -%}
 
-{% for package, settings in python2.packages.items() -%}
+{% for package, opts in python2.pips.iteritems() -%}
 {{ package }}_pip_install:
   pip.installed:
+    {{ sls_block(opts) }}
     - name: {{ package }}
     - require:
       - pkg: python_pip_install
-{% if settings.config is defined and settings.config != None -%}
-    {{ settings.config|yaml() }}
-{% endif %}
 {% endfor -%}
